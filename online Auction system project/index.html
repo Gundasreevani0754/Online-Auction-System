@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BidderX | Premium Jewelry & Watches</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Background Shapes for Glassmorphism -->
+    <div class="hero-bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-gem"></i></div>
+                BidderX
+            </a>
+            <div class="nav-links">
+                <a href="#" class="active">Home</a>
+                <a href="#">Collections</a>
+                <a href="#">How it Works</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-glass" onclick="document.body.classList.toggle('dark-mode')"><i class="fa-solid fa-moon"></i></button>
+                <a href="login.html" class="btn btn-secondary">Log In</a>
+                <a href="register.html" class="btn btn-primary">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero container">
+        <div class="hero-content">
+            <div class="hero-text fade-in">
+                <h1>Where Time Meets <span class="text-gradient">Timeless Beauty</span></h1>
+                <p>Bid on the world's most luxurious women's jewelry and premium watches. Secure, transparent, and trusted by collectors worldwide.</p>
+                <div class="hero-buttons">
+                    <a href="login.html" class="btn btn-primary">Start Bidding <i class="fa-solid fa-arrow-right"></i></a>
+                    <a href="register.html" class="btn btn-glass"><i class="fa-solid fa-plus"></i> Become a Seller</a>
+                </div>
+                
+                <div style="display: flex; gap: 2rem; margin-top: 3rem;">
+                    <div>
+                        <h3 class="text-gradient" style="margin-bottom: 0;">150K+</h3>
+                        <span style="font-size: 0.9rem; color: var(--text-muted)">Active Users</span>
+                    </div>
+                    <div>
+                        <h3 class="text-gradient" style="margin-bottom: 0;">40K+</h3>
+                        <span style="font-size: 0.9rem; color: var(--text-muted)">Live Auctions</span>
+                    </div>
+                    <div>
+                        <h3 class="text-gradient" style="margin-bottom: 0;">₹400 Cr+</h3>
+                        <span style="font-size: 0.9rem; color: var(--text-muted)">Trading Volume</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-image-wrapper slide-up">
+                <div class="floating-badge badge-1 glass">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--success); display: flex; align-items: center; justify-content: center; color: white;">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">Verified Seller</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">Trust Score 99%</div>
+                    </div>
+                </div>
+                
+                <div class="hero-card glass-card">
+                    <div class="auction-img-wrapper" style="height: 300px; margin-bottom: 1rem;">
+                        <img src="https://images.unsplash.com/photo-1542496658-e3267894cb97?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Rolex Watch" class="auction-img" style="border-radius: 12px;">
+                        <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+                        <div class="countdown-timer"><i class="fa-regular fa-clock"></i> 04:23:45</div>
+                    </div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Rolex Submariner Date</h3>
+                    <div class="bid-info" style="border: none; padding: 0;">
+                        <div class="current-bid">
+                            <span class="bid-label">Current Highest Bid</span>
+                            <span class="bid-amount">₹12,00,000</span>
+                        </div>
+                        <a href="login.html" class="btn btn-primary" style="padding: 0.5rem 1rem; border-radius: 8px;">Place Bid</a>
+                    </div>
+                </div>
+                
+                <div class="floating-badge badge-2 glass">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white;">
+                        <i class="fa-solid fa-gavel"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">New Bid!</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">John D. bid ₹12,00,000</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trending Section -->
+    <section class="container" style="padding: 5rem 2rem;">
+        <h2 class="section-title">Trending <span class="text-gradient">Collections</span></h2>
+        
+        <div class="auctions-grid">
+            <!-- Card 1 -->
+            <div class="glass-card auction-card slide-up" style="animation-delay: 0.1s;">
+                <div class="auction-img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1599643478514-4a4e0f1523bb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Diamond Ring" class="auction-img">
+                    <button class="watchlist-btn"><i class="fa-regular fa-heart"></i></button>
+                    <div class="countdown-timer"><i class="fa-regular fa-clock"></i> 02:15:30</div>
+                </div>
+                <div class="auction-info">
+                    <div class="auction-category">Women's Jewelry</div>
+                    <div class="auction-title">18K White Gold Diamond Ring (2ct)</div>
+                    <div class="seller-info">
+                        <img src="https://i.pravatar.cc/100?img=1" alt="Seller" class="seller-avatar">
+                        <span>TiffanyCo <i class="fa-solid fa-circle-check verified-icon"></i></span>
+                    </div>
+                    <div class="bid-info">
+                        <div class="current-bid">
+                            <span class="bid-label">Current Bid</span>
+                            <span class="bid-amount">₹6,80,000</span>
+                        </div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">15 Bids</span>
+                    </div>
+                    <a href="login.html" class="btn btn-primary" style="width: 100%; border-radius: 12px;">Login to Bid</a>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="glass-card auction-card slide-up" style="animation-delay: 0.2s;">
+                <div class="auction-img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Omega Watch" class="auction-img">
+                    <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+                    <button class="watchlist-btn"><i class="fa-regular fa-heart"></i></button>
+                </div>
+                <div class="auction-info">
+                    <div class="auction-category">Luxury Watches</div>
+                    <div class="auction-title">Omega Speedmaster Professional</div>
+                    <div class="seller-info">
+                        <img src="https://i.pravatar.cc/100?img=2" alt="Seller" class="seller-avatar">
+                        <span>LuxuryTime <i class="fa-solid fa-circle-check verified-icon"></i></span>
+                    </div>
+                    <div class="bid-info">
+                        <div class="current-bid">
+                            <span class="bid-label">Current Bid</span>
+                            <span class="bid-amount">₹5,40,000</span>
+                        </div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">42 Bids</span>
+                    </div>
+                    <a href="login.html" class="btn btn-primary" style="width: 100%; border-radius: 12px;">Login to Bid</a>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="glass-card auction-card slide-up" style="animation-delay: 0.3s;">
+                <div class="auction-img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Diamond Necklace" class="auction-img">
+                    <button class="watchlist-btn"><i class="fa-regular fa-heart"></i></button>
+                    <div class="countdown-timer"><i class="fa-regular fa-clock"></i> 1d 05:40:00</div>
+                </div>
+                <div class="auction-info">
+                    <div class="auction-category">Women's Jewelry</div>
+                    <div class="auction-title">Cartier Platinum Diamond Necklace</div>
+                    <div class="seller-info">
+                        <img src="https://i.pravatar.cc/100?img=3" alt="Seller" class="seller-avatar">
+                        <span>PremiumJewels <i class="fa-solid fa-circle-check verified-icon"></i></span>
+                    </div>
+                    <div class="bid-info">
+                        <div class="current-bid">
+                            <span class="bid-label">Current Bid</span>
+                            <span class="bid-amount">₹10,00,000</span>
+                        </div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">8 Bids</span>
+                    </div>
+                    <a href="login.html" class="btn btn-primary" style="width: 100%; border-radius: 12px;">Login to Bid</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="#" class="logo" style="margin-bottom: 1rem;">
+                        <div class="logo-icon"><i class="fa-solid fa-gem"></i></div>
+                        BidderX
+                    </a>
+                    <p style="font-size: 0.9rem;">The most trusted platform for premium jewelry and watches.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Marketplace</h4>
+                    <div class="footer-links">
+                        <a href="#">Luxury Watches</a>
+                        <a href="#">Women's Jewelry</a>
+                        <a href="#">Diamonds</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Resources</h4>
+                    <div class="footer-links">
+                        <a href="#">Help Center</a>
+                        <a href="#">Authentication</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 BidderX. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>
