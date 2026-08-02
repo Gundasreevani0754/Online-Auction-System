@@ -1,6 +1,7 @@
 import { createApp } from './src/app.js';
 import { HOST, PORT } from './src/config.js';
 import { closeDb, getDb } from './src/db/index.js';
+import { attachRealtime, closeRealtime } from './src/realtime/hub.js';
 
 // Opens the database file and applies the schema before the first request.
 getDb();
@@ -8,6 +9,9 @@ getDb();
 const app = createApp();
 
 const server = app.listen(PORT);
+
+// Live bid updates share the HTTP server, so there is only one port to run.
+attachRealtime(server);
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
@@ -28,6 +32,7 @@ server.on('listening', () => {
 
 for (const signal of ['SIGINT', 'SIGTERM']) {
   process.on(signal, () => {
+    closeRealtime();
     server.close(() => {
       closeDb();
       process.exit(0);

@@ -4,6 +4,7 @@ import express from 'express';
 import { ROOT_DIR } from '../config.js';
 import { requireAuth } from '../auth/middleware.js';
 import { BID_ERRORS, getAuctionById, isBiddable, listBidHistory, placeBid } from '../db/bids.js';
+import { broadcastBid } from '../realtime/hub.js';
 
 export const auctionsRouter = express.Router();
 
@@ -62,8 +63,13 @@ auctionsRouter.post('/bids', requireAuth, (req, res) => {
     return res.status(400).json({ error: result.error });
   }
 
-  return res.json({
+  const payload = {
     auction: { ...result.auction, isBiddable: isBiddable(result.auction) },
     bids: listBidHistory(auctionId),
-  });
+  };
+
+  // Everyone watching this auction sees the new bid immediately.
+  broadcastBid(payload);
+
+  return res.json(payload);
 });

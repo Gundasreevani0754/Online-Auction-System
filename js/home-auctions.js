@@ -25,6 +25,13 @@
     var countdowns = [];
     var isSignedIn = false;
 
+    /** auctionId -> { price, label, count } nodes, for live price updates. */
+    var cardsById = {};
+
+    function serverNow() {
+        return window.BidderXLive ? window.BidderXLive.now() : Date.now();
+    }
+
     function el(tag, className, text) {
         var node = document.createElement(tag);
         if (className) {
@@ -45,7 +52,7 @@
     }
 
     function formatTimeLeft(endTime) {
-        var remaining = new Date(endTime).getTime() - Date.now();
+        var remaining = new Date(endTime).getTime() - serverNow();
         if (!isFinite(remaining) || remaining <= 0) {
             return 'Ended';
         }
@@ -98,14 +105,18 @@
 
         var bidInfo = el('div', 'bid-info');
         var currentBid = el('div', 'current-bid');
-        currentBid.appendChild(el('span', 'bid-label', auction.bidCount > 0 ? 'Current Bid' : 'Starting Bid'));
-        currentBid.appendChild(el('span', 'bid-amount', money(auction.currentPrice)));
+        var label = el('span', 'bid-label', auction.bidCount > 0 ? 'Current Bid' : 'Starting Bid');
+        var price = el('span', 'bid-amount', money(auction.currentPrice));
+        currentBid.appendChild(label);
+        currentBid.appendChild(price);
         bidInfo.appendChild(currentBid);
 
         var count = el('span', null, auction.bidCount + (auction.bidCount === 1 ? ' Bid' : ' Bids'));
         count.style.cssText = 'font-size: 0.8rem; color: var(--text-muted);';
         bidInfo.appendChild(count);
         info.appendChild(bidInfo);
+
+        cardsById[auction.auctionId] = { price: price, label: label, count: count };
 
         // Signed-out visitors keep the original "Login to Bid" wording; the
         // auction page itself is public either way.
@@ -142,6 +153,29 @@
                     target.node.textContent = ' ' + formatTimeLeft(target.endTime);
                 });
             }, MS_PER_SECOND);
+
+            // Prices update here while someone bids on the auction page.
+            if (window.BidderXLive) {
+                window.BidderXLive.connect('all', {
+                    onPrice: function onPrice(message) {
+                        var card = cardsById[message.auctionId];
+                        if (!card) {
+                            return;
+                        }
+
+                        card.price.textContent = money(message.currentPrice);
+                        card.label.textContent = message.bidCount > 0 ? 'Current Bid' : 'Starting Bid';
+                        card.count.textContent =
+                            message.bidCount + (message.bidCount === 1 ? ' Bid' : ' Bids');
+
+                        card.price.style.transition = 'color 0.2s ease';
+                        card.price.style.color = 'var(--success)';
+                        window.setTimeout(function restore() {
+                            card.price.style.color = '';
+                        }, 1200);
+                    },
+                });
+            }
         })
         .catch(function () {
             /* Leave the static cards in place if the feed cannot be reached. */

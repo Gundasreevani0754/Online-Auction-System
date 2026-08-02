@@ -21,6 +21,15 @@
     var countdownTimer = null;
     var countdownNode = null;
     var currentEndTime = null;
+    var viewer = null;
+
+    /** Live nodes updated in place when someone else bids. */
+    var view = {};
+
+    /** Server-corrected clock, falling back to local time before the socket opens. */
+    function serverNow() {
+        return window.BidderXLive ? window.BidderXLive.now() : Date.now();
+    }
 
     // ---------------------------------------------------------------- helpers
 
@@ -44,7 +53,7 @@
     }
 
     function formatTimeLeft(endTime) {
-        var remaining = new Date(endTime).getTime() - Date.now();
+        var remaining = new Date(endTime).getTime() - serverNow();
         if (!isFinite(remaining) || remaining <= 0) {
             return 'Ended';
         }
@@ -58,7 +67,7 @@
     }
 
     function timeAgo(isoDate) {
-        var elapsed = Date.now() - new Date(isoDate).getTime();
+        var elapsed = serverNow() - new Date(isoDate).getTime();
         if (elapsed < MS_PER_MINUTE) {
             return 'just now';
         }
@@ -112,6 +121,7 @@
 
         var label = el('label', 'form-label', 'Your Bid (minimum ' + money(minimum) + ')');
         label.setAttribute('for', 'bid-amount');
+        view.minimumLabel = label;
 
         var input = el('input', 'form-control');
         input.type = 'number';
@@ -121,6 +131,13 @@
         input.step = '1';
         input.required = true;
         input.value = String(minimum);
+        view.input = input;
+
+        // Once the bidder types their own figure we stop overwriting it when
+        // someone else's bid arrives.
+        input.addEventListener('input', function markTouched() {
+            input.dataset.touched = 'true';
+        });
 
         var submit = el('button', 'btn btn-primary btn-full', 'Place Bid');
         submit.type = 'submit';
@@ -298,12 +315,14 @@
 
         var priceRow = el('div', 'bid-info');
         var current = el('div', 'current-bid');
-        current.appendChild(el('span', 'bid-label', auction.bidCount > 0 ? 'Current Highest Bid' : 'Starting Bid'));
-        current.appendChild(el('span', 'bid-amount', money(auction.currentPrice)));
+        view.priceLabel = el('span', 'bid-label', auction.bidCount > 0 ? 'Current Highest Bid' : 'Starting Bid');
+        view.price = el('span', 'bid-amount', money(auction.currentPrice));
+        current.appendChild(view.priceLabel);
+        current.appendChild(view.price);
         priceRow.appendChild(current);
-        var count = el('span', null, auction.bidCount + (auction.bidCount === 1 ? ' Bid' : ' Bids'));
-        count.style.cssText = 'font-size: 0.85rem; color: var(--text-muted);';
-        priceRow.appendChild(count);
+        view.count = el('span', null, auction.bidCount + (auction.bidCount === 1 ? ' Bid' : ' Bids'));
+        view.count.style.cssText = 'font-size: 0.85rem; color: var(--text-muted);';
+        priceRow.appendChild(view.count);
         infoCard.appendChild(priceRow);
 
         infoCard.appendChild(buildBidForm(state));
@@ -327,11 +346,54 @@
     }
 
     function render(state) {
+        viewer = state.viewer;
+        view = {};
         container.textContent = '';
         container.appendChild(buildDetail(state));
-        container.appendChild(buildHistory(state.bids, state.viewer));
+        view.history = buildHistory(state.bids, state.viewer);
+        container.appendChild(view.history);
         document.title = state.auction.title + ' - BidderX';
         startCountdown();
+    }
+
+    /** Briefly highlights the price so a change is noticeable. */
+    function flash(node) {
+        node.style.transition = 'color 0.2s ease';
+        node.style.color = 'var(--success)';
+        window.setTimeout(function restore() {
+            node.style.color = '';
+        }, 1200);
+    }
+
+    /**
+     * Applies someone else's bid without rebuilding the page, so a half-typed
+     * amount is not thrown away.
+     */
+    function applyLiveUpdate(auction, bids) {
+        if (!view.price) {
+            return;
+        }
+
+        view.price.textContent = money(auction.currentPrice);
+        view.priceLabel.textContent = auction.bidCount > 0 ? 'Current Highest Bid' : 'Starting Bid';
+        view.count.textContent = auction.bidCount + (auction.bidCount === 1 ? ' Bid' : ' Bids');
+        flash(view.price);
+
+        currentEndTime = auction.endTime;
+
+        var replacement = buildHistory(bids, viewer);
+        container.replaceChild(replacement, view.history);
+        view.history = replacement;
+
+        if (view.input) {
+            var minimum = auction.currentPrice + 1;
+            view.input.min = String(minimum);
+            view.minimumLabel.textContent = 'Your Bid (minimum ' + money(minimum) + ')';
+
+            if (view.input.dataset.touched !== 'true') {
+                view.input.value = String(minimum);
+            }
+        }
     }
 
     function showMessage(text) {
@@ -355,7 +417,16 @@
                 showMessage('That auction could not be found.');
                 return;
             }
+
             render(data);
+
+            if (window.BidderXLive) {
+                window.BidderXLive.connect(auctionId, {
+                    onBid: function onBid(message) {
+                        applyLiveUpdate(message.auction, message.bids);
+                    },
+                });
+            }
         })
         .catch(function () {
             showMessage('Could not load this auction. Please refresh the page.');
