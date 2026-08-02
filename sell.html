@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List an Item - BidderX</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="overflow-x: hidden; min-height: 100vh;">
+
+    <!-- Background Shapes -->
+    <div class="hero-bg-shapes" style="position: fixed;">
+        <div class="shape shape-1" style="top: -20%; left: -10%;"></div>
+        <div class="shape shape-2" style="bottom: -20%; right: -10%;"></div>
+        <div class="shape shape-3" style="top: 50%; right: 20%; width: 300px; height: 300px;"></div>
+    </div>
+
+    <!-- Back Button -->
+    <a href="dashboard.html" class="btn btn-glass" style="position: absolute; top: 2rem; left: 2rem; z-index: 100;">
+        <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+    </a>
+
+    <!-- Theme Toggle -->
+    <button class="btn btn-glass" style="position: absolute; top: 2rem; right: 2rem; z-index: 100;" onclick="document.body.classList.toggle('dark-mode')">
+        <i class="fa-solid fa-moon"></i>
+    </button>
+
+    <div class="auth-page" style="padding: 5rem 2rem;">
+        <div class="glass-card auth-card slide-up" style="max-width: 640px;">
+            <div class="auth-header">
+                <div class="logo flex-center" style="margin-bottom: 1rem; justify-content: center;">
+                    <div class="logo-icon"><i class="fa-solid fa-gem"></i></div>
+                    <h2>BidderX</h2>
+                </div>
+                <h2 class="text-gradient">List an Item</h2>
+                <p>Put your piece in front of collectors worldwide.</p>
+            </div>
+
+            <div id="form-error" role="alert" style="display: none; margin-bottom: 1.5rem; padding: 0.8rem 1rem; border-radius: 12px; background: rgba(239, 68, 68, 0.12); border: 1px solid var(--danger); color: var(--danger); font-size: 0.9rem;"></div>
+
+            <form action="/items" method="post">
+                <div class="form-group">
+                    <label class="form-label" for="title">Item Title</label>
+                    <input type="text" id="title" name="title" class="form-control" placeholder="Rolex Submariner Date" maxlength="120" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="category">Category</label>
+                    <select id="category" name="category" class="form-control" style="font-family: inherit; cursor: pointer;" required>
+                        <option value="" disabled selected>Select a category</option>
+                        <option value="Women's Jewelry">Women's Jewelry</option>
+                        <option value="Luxury Watches">Luxury Watches</option>
+                        <option value="Diamonds">Diamonds</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea id="description" name="description" class="form-control" style="font-family: inherit; resize: vertical;" rows="4" maxlength="1000" placeholder="Condition, certification, box and papers…" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="imageUrl">Photo URL</label>
+                    <input type="url" id="imageUrl" name="imageUrl" class="form-control" placeholder="https://images.unsplash.com/photo-…" required>
+                    <div id="image-preview-wrapper" class="auction-img-wrapper" style="display: none; margin-top: 1rem; height: 180px;">
+                        <img id="image-preview" class="auction-img" alt="Preview of the item photo">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="startingPrice">Starting Bid (₹)</label>
+                        <input type="number" id="startingPrice" name="startingPrice" class="form-control" placeholder="500000" min="1" step="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="endTime">Auction Ends</label>
+                        <input type="datetime-local" id="endTime" name="endTime" class="form-control" style="font-family: inherit;" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full" style="margin-top: 0.5rem;">Publish Listing <i class="fa-solid fa-gavel"></i></button>
+            </form>
+
+            <div class="auth-footer">
+                Changed your mind? <a href="dashboard.html">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/sell.js"></script>
+</body>
+</html>

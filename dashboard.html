@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - BidderX</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Background Shapes for Glassmorphism -->
+    <div class="hero-bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-gem"></i></div>
+                BidderX
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="dashboard.html" class="active">Dashboard</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-glass" onclick="document.body.classList.toggle('dark-mode')"><i class="fa-solid fa-moon"></i></button>
+                <span id="nav-user" class="btn btn-glass" style="cursor: default;"><i class="fa-solid fa-user"></i> <span id="nav-user-name">Account</span></span>
+                <form action="/logout" method="post" style="margin: 0;">
+                    <button type="submit" class="btn btn-secondary">Log Out <i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container" style="padding: 8rem 2rem 5rem;">
+
+        <!-- Greeting -->
+        <div class="fade-in" style="margin-bottom: 2.5rem;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Welcome back, <span class="text-gradient" id="greeting-name">there</span></h1>
+            <p style="color: var(--text-muted);" id="greeting-subtitle">Loading your dashboard…</p>
+        </div>
+
+        <!-- Stats -->
+        <div id="stats-row" class="auctions-grid" style="margin-bottom: 4rem;"></div>
+
+        <!-- Role specific sections are rendered here -->
+        <div id="dashboard-sections"></div>
+
+        <!-- Empty / error state -->
+        <div id="dashboard-message" class="glass-card" style="display: none; padding: 2rem; text-align: center; color: var(--text-muted);"></div>
+
+    </main>
+
+    <script>
+        // Navbar scroll effect - matches the behaviour on the home page.
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    </script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

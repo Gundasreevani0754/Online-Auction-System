@@ -37,18 +37,20 @@
                 <p>Enter your credentials to access your account</p>
             </div>
 
-            <form action="index.html">
+            <div id="form-error" role="alert" style="display: none; margin-bottom: 1.5rem; padding: 0.8rem 1rem; border-radius: 12px; background: rgba(239, 68, 68, 0.12); border: 1px solid var(--danger); color: var(--danger); font-size: 0.9rem;"></div>
+
+            <form action="/login" method="post">
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
-                    <input type="email" class="form-control" placeholder="john@example.com" required>
+                    <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
                 </div>
-                
+
                 <div class="form-group">
                     <div class="flex-between">
                         <label class="form-label">Password</label>
                         <a href="#" style="font-size: 0.8rem; color: var(--primary);">Forgot Password?</a>
                     </div>
-                    <input type="password" class="form-control" placeholder="••••••••" required>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-full">Sign In <i class="fa-solid fa-arrow-right-to-bracket"></i></button>
@@ -71,5 +73,6 @@
         </div>
     </div>
 
+    <script src="js/auth-form.js"></script>
 </body>
 </html>
