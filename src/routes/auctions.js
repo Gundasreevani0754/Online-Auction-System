@@ -5,6 +5,7 @@ import { ROOT_DIR } from '../config.js';
 import { requireAuth } from '../auth/middleware.js';
 import { BID_ERRORS, getAuctionById, isBiddable, listBidHistory, placeBid } from '../db/bids.js';
 import { broadcastBid } from '../realtime/hub.js';
+import { getByAuctionId, markPaid } from '../db/transactions.js';
 
 export const auctionsRouter = express.Router();
 
@@ -39,6 +40,7 @@ auctionsRouter.get('/api/auctions/:id', (req, res) => {
   return res.json({
     auction: { ...auction, isBiddable: isBiddable(auction) },
     bids: listBidHistory(auctionId),
+    payment: getByAuctionId(auctionId) ?? null,
     viewer: viewer
       ? {
           id: viewer.id,
@@ -47,6 +49,26 @@ auctionsRouter.get('/api/auctions/:id', (req, res) => {
         }
       : null,
   });
+});
+
+/**
+ * Simulated checkout. No card details are asked for or stored - it simply
+ * records that the winner has settled up.
+ */
+auctionsRouter.post('/checkout', requireAuth, (req, res) => {
+  const auctionId = asId(req.body.auctionId);
+
+  if (auctionId === null) {
+    return res.status(400).json({ error: BID_ERRORS.NOT_FOUND });
+  }
+
+  const result = markPaid({ auctionId, buyerId: req.user.id });
+
+  if (!result.ok) {
+    return res.status(400).json({ error: result.error });
+  }
+
+  return res.json({ payment: result.transaction });
 });
 
 auctionsRouter.post('/bids', requireAuth, (req, res) => {
@@ -66,6 +88,7 @@ auctionsRouter.post('/bids', requireAuth, (req, res) => {
   const payload = {
     auction: { ...result.auction, isBiddable: isBiddable(result.auction) },
     bids: listBidHistory(auctionId),
+    extended: result.extended,
   };
 
   // Everyone watching this auction sees the new bid immediately.

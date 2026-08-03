@@ -156,10 +156,10 @@ export function attachRealtime(server) {
  *
  * @param {{ auction: object, bids: object[] }} update
  */
-export function broadcastBid({ auction, bids }) {
+export function broadcastBid({ auction, bids, extended = false }) {
   const serverNow = Date.now();
 
-  sendToRoom(roomKey(auction.auctionId), { type: 'bid', auction, bids, serverNow });
+  sendToRoom(roomKey(auction.auctionId), { type: 'bid', auction, bids, extended, serverNow });
   sendToRoom(ALL_ROOM, {
     type: 'price',
     auctionId: auction.auctionId,
@@ -167,6 +167,19 @@ export function broadcastBid({ auction, bids }) {
     bidCount: auction.bidCount,
     serverNow,
   });
+}
+
+/**
+ * Announces that an auction has finished, so open pages switch to the result
+ * without anyone refreshing.
+ *
+ * @param {object} auction
+ */
+export function broadcastClose(auction) {
+  const serverNow = Date.now();
+
+  sendToRoom(roomKey(auction.auctionId), { type: 'closed', auction, serverNow });
+  sendToRoom(ALL_ROOM, { type: 'closed', auctionId: auction.auctionId, serverNow });
 }
 
 export function closeRealtime() {

@@ -88,6 +88,84 @@
         return node;
     }
 
+    // -------------------------------------------------------------- checkout
+
+    /**
+     * Simulated payment. No card details are collected - the button simply
+     * confirms the amount and records the sale as settled.
+     */
+    function buildCheckout(state) {
+        var wrapper = el('div');
+
+        var error = el('div');
+        error.setAttribute('role', 'alert');
+        error.style.display = 'none';
+
+        var summary = el('div');
+        summary.style.cssText =
+            'display: flex; justify-content: space-between; align-items: center;' +
+            'padding: 0.9rem 0; margin-bottom: 0.5rem; border-top: 1px solid var(--glass-border);';
+        summary.appendChild(el('span', 'bid-label', 'Amount payable'));
+        summary.appendChild(el('span', 'bid-amount', money(state.payment.amount)));
+
+        var pay = el('button', 'btn btn-primary btn-full', 'Complete Payment');
+        pay.type = 'button';
+
+        var note = el('p', null, 'Demonstration checkout - no card details are collected.');
+        note.style.cssText = 'font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 0.75rem;';
+
+        pay.addEventListener('click', function completePayment() {
+            error.style.display = 'none';
+            pay.disabled = true;
+            pay.textContent = 'Processing…';
+
+            fetch('/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify({ auctionId: state.auction.auctionId }),
+            })
+                .then(function (response) {
+                    return response.json().then(function (body) {
+                        return { ok: response.ok, body: body };
+                    });
+                })
+                .then(function (result) {
+                    if (!result.ok) {
+                        error.textContent = result.body.error || 'Payment could not be completed.';
+                        error.style.cssText =
+                            'display: block; padding: 0.8rem 1rem; border-radius: 12px; margin-bottom: 1rem;' +
+                            'background: rgba(239, 68, 68, 0.12); border: 1px solid var(--danger);' +
+                            'color: var(--danger); font-size: 0.9rem;';
+                        pay.disabled = false;
+                        pay.textContent = 'Complete Payment';
+                        return;
+                    }
+
+                    render({
+                        auction: state.auction,
+                        bids: view.lastBids,
+                        viewer: viewer,
+                        payment: result.body.payment,
+                    });
+                })
+                .catch(function () {
+                    error.textContent = 'Could not reach the server. Please try again.';
+                    error.style.cssText =
+                        'display: block; padding: 0.8rem 1rem; border-radius: 12px; margin-bottom: 1rem;' +
+                        'background: rgba(239, 68, 68, 0.12); border: 1px solid var(--danger);' +
+                        'color: var(--danger); font-size: 0.9rem;';
+                    pay.disabled = false;
+                    pay.textContent = 'Complete Payment';
+                });
+        });
+
+        wrapper.appendChild(error);
+        wrapper.appendChild(summary);
+        wrapper.appendChild(pay);
+        wrapper.appendChild(note);
+        return wrapper;
+    }
+
     // ------------------------------------------------------------- bid form
 
     function buildBidForm(state) {
@@ -97,7 +175,29 @@
         wrapper.style.marginTop = '1.5rem';
 
         if (!auction.isBiddable) {
-            wrapper.appendChild(notice('This auction has ended.', '#94A3B8'));
+            if (auction.winnerName && viewer && viewer.id === auction.winnerId) {
+                var isPaid = state.payment && state.payment.status === 'paid';
+
+                wrapper.appendChild(
+                    notice(
+                        isPaid
+                            ? 'You won this auction at ' + money(auction.currentPrice) + '. Payment complete.'
+                            : 'Congratulations - you won this auction at ' + money(auction.currentPrice) + '.',
+                        '#22C55E',
+                    ),
+                );
+
+                if (!isPaid && state.payment) {
+                    wrapper.appendChild(buildCheckout(state));
+                }
+            } else if (auction.winnerName) {
+                wrapper.appendChild(notice('This auction has ended. Won by ' + auction.winnerName + ' at ' + money(auction.currentPrice) + '.', '#94A3B8'));
+            } else if (auction.status === 'closed') {
+                wrapper.appendChild(notice('This auction ended with no bids.', '#94A3B8'));
+            } else {
+                wrapper.appendChild(notice('This auction has ended.', '#94A3B8'));
+            }
+
             return wrapper;
         }
 
@@ -177,7 +277,13 @@
                         return;
                     }
 
-                    render({ auction: result.body.auction, bids: result.body.bids, viewer: viewer, justBid: true });
+                    render({
+                        auction: result.body.auction,
+                        bids: result.body.bids,
+                        viewer: viewer,
+                        justBid: true,
+                        extended: result.body.extended,
+                    });
                 })
                 .catch(function () {
                     error.textContent = 'Could not reach the server. Please try again.';
@@ -292,6 +398,13 @@
             infoCard.appendChild(notice('Your bid was placed. You are the highest bidder.', '#22C55E'));
         }
 
+        view.extensionSlot = el('div');
+        infoCard.appendChild(view.extensionSlot);
+
+        if (state.extended) {
+            showExtensionNotice();
+        }
+
         infoCard.appendChild(el('div', 'auction-category', auction.category));
 
         var title = el('h1', null, auction.title);
@@ -351,6 +464,7 @@
         container.textContent = '';
         container.appendChild(buildDetail(state));
         view.history = buildHistory(state.bids, state.viewer);
+        view.lastBids = state.bids;
         container.appendChild(view.history);
         document.title = state.auction.title + ' - BidderX';
         startCountdown();
@@ -369,9 +483,25 @@
      * Applies someone else's bid without rebuilding the page, so a half-typed
      * amount is not thrown away.
      */
-    function applyLiveUpdate(auction, bids) {
+    /** Shown when a late bid pushes the finish line back. */
+    function showExtensionNotice() {
+        if (!view.extensionSlot) {
+            return;
+        }
+
+        view.extensionSlot.textContent = '';
+        view.extensionSlot.appendChild(
+            notice('A late bid extended this auction by 2 minutes.', '#F59E0B'),
+        );
+    }
+
+    function applyLiveUpdate(auction, bids, extended) {
         if (!view.price) {
             return;
+        }
+
+        if (extended) {
+            showExtensionNotice();
         }
 
         view.price.textContent = money(auction.currentPrice);
@@ -384,6 +514,7 @@
         var replacement = buildHistory(bids, viewer);
         container.replaceChild(replacement, view.history);
         view.history = replacement;
+        view.lastBids = bids;
 
         if (view.input) {
             var minimum = auction.currentPrice + 1;
@@ -423,7 +554,23 @@
             if (window.BidderXLive) {
                 window.BidderXLive.connect(auctionId, {
                     onBid: function onBid(message) {
-                        applyLiveUpdate(message.auction, message.bids);
+                        applyLiveUpdate(message.auction, message.bids, message.extended);
+                    },
+                    onClosed: function onClosed() {
+                        // Refetch so the result carries the payment record the
+                        // server has just created for the winner.
+                        fetch('/api/auctions/' + auctionId, { headers: { Accept: 'application/json' } })
+                            .then(function (response) {
+                                return response.ok ? response.json() : null;
+                            })
+                            .then(function (fresh) {
+                                if (fresh) {
+                                    render(fresh);
+                                }
+                            })
+                            .catch(function () {
+                                /* Keep showing the last known state. */
+                            });
                     },
                 });
             }

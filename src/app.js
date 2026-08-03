@@ -67,8 +67,22 @@ export function createApp() {
 
   // eslint-disable-next-line no-unused-vars -- Express identifies error handlers by arity.
   app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(500).send('500 - Something went wrong');
+    // Errors raised by the body parser already carry the right status - a
+    // malformed JSON body is the caller's mistake (400), not a server fault.
+    const status = err.status || err.statusCode || 500;
+
+    if (status >= 500) {
+      console.error(err);
+    }
+
+    const message = status === 400 ? 'Bad request' : 'Something went wrong';
+
+    if (req.path.startsWith('/api/') || req.accepts(['html', 'json']) === 'json') {
+      res.status(status).json({ error: message });
+      return;
+    }
+
+    res.status(status).send(`${status} - ${message}`);
   });
 
   return app;

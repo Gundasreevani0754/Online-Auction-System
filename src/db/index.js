@@ -26,6 +26,11 @@ export function getDb() {
   db.exec('PRAGMA journal_mode = WAL');
   db.exec('PRAGMA foreign_keys = ON');
 
+  // If another process holds the write lock (a seed script run while the
+  // server is up, for example), wait a few seconds and then fail loudly.
+  // Without this the server would block indefinitely on that lock.
+  db.exec('PRAGMA busy_timeout = 5000');
+
   db.exec(fs.readFileSync(SCHEMA_PATH, 'utf8'));
 
   return db;

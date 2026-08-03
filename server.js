@@ -1,7 +1,8 @@
 import { createApp } from './src/app.js';
 import { HOST, PORT } from './src/config.js';
 import { closeDb, getDb } from './src/db/index.js';
-import { attachRealtime, closeRealtime } from './src/realtime/hub.js';
+import { attachRealtime, broadcastClose, closeRealtime } from './src/realtime/hub.js';
+import { startAuctionCloser, stopAuctionCloser } from './src/auctions/closer.js';
 
 // Opens the database file and applies the schema before the first request.
 getDb();
@@ -12,6 +13,9 @@ const server = app.listen(PORT);
 
 // Live bid updates share the HTTP server, so there is only one port to run.
 attachRealtime(server);
+
+// Ends auctions on schedule and tells everyone watching.
+startAuctionCloser(broadcastClose);
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
@@ -32,6 +36,7 @@ server.on('listening', () => {
 
 for (const signal of ['SIGINT', 'SIGTERM']) {
   process.on(signal, () => {
+    stopAuctionCloser();
     closeRealtime();
     server.close(() => {
       closeDb();

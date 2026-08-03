@@ -61,9 +61,12 @@ export function listItemsBySeller(sellerId) {
   return getDb()
     .prepare(
       `SELECT ${AUCTION_CARD_COLUMNS},
-              i.id AS itemId
+              i.id     AS itemId,
+              t.status AS paymentStatus,
+              a.winner_id AS winnerId
        FROM items i
-       LEFT JOIN auctions a ON a.item_id = i.id
+       LEFT JOIN auctions a      ON a.item_id = i.id
+       LEFT JOIN transactions t  ON t.auction_id = a.id
        WHERE i.seller_id = ?
        ORDER BY a.end_time ASC`,
     )

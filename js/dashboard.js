@@ -187,10 +187,47 @@
     function listingFooter(listing) {
         var footer = el('div');
         footer.style.cssText = 'margin-top: 0.75rem;';
-        footer.appendChild(
-            listing.status === 'open' ? pill('Live', '#22C55E') : pill('Closed', '#94A3B8'),
-        );
+
+        if (listing.status === 'open') {
+            footer.appendChild(pill('Live', '#22C55E'));
+        } else if (listing.paymentStatus === 'paid') {
+            footer.appendChild(pill('Sold · Paid', '#22C55E'));
+        } else if (listing.winnerId) {
+            footer.appendChild(pill('Sold · Awaiting payment', '#F59E0B'));
+        } else {
+            footer.appendChild(pill('Unsold', '#94A3B8'));
+        }
+
         return footer;
+    }
+
+    /** A card for an auction this buyer won, with its payment state. */
+    function winCard(win) {
+        var footer = el('div');
+        footer.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: 0.75rem;';
+
+        var seller = el('span', null, win.sellerName);
+        seller.style.cssText = 'font-size: 0.85rem; color: var(--text-muted);';
+        footer.appendChild(seller);
+        footer.appendChild(
+            win.paymentStatus === 'paid' ? pill('Paid', '#22C55E') : pill('Payment due', '#F59E0B'),
+        );
+
+        var card = auctionCard(
+            {
+                auctionId: win.auctionId,
+                title: win.title,
+                category: win.category,
+                imageUrl: win.imageUrl,
+                currentPrice: win.amount,
+                bidCount: win.bidCount,
+                endTime: win.endTime,
+                status: 'closed',
+            },
+            { footer: footer, priceLabel: 'Winning Bid' },
+        );
+
+        return card;
     }
 
     function bidsReceivedList(bids) {
@@ -239,6 +276,14 @@
     // ------------------------------------------------------------------ views
 
     function renderBuyer(data) {
+        var wins = data.wins || [];
+
+        // Won auctions come first - an unpaid one needs the buyer's attention.
+        if (wins.length > 0) {
+            sections.appendChild(sectionHeading('Auctions You Won'));
+            sections.appendChild(grid(wins.map(winCard)));
+        }
+
         sections.appendChild(sectionHeading('My Bids'));
         sections.appendChild(
             data.myBids.length > 0

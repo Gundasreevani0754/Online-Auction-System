@@ -76,6 +76,8 @@
             callbacks.onBid(message);
         } else if (message.type === 'price' && typeof callbacks.onPrice === 'function') {
             callbacks.onPrice(message);
+        } else if (message.type === 'closed' && typeof callbacks.onClosed === 'function') {
+            callbacks.onClosed(message);
         }
     }
 

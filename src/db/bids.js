@@ -8,6 +8,14 @@ import { getDb, nowIso } from './index.js';
  * both succeed.
  */
 
+/**
+ * Anti-sniping. A bid inside the final window pushes the finish line back, so
+ * an auction cannot be won by bidding one second before the end - there is
+ * always time to respond.
+ */
+export const ANTI_SNIPE_WINDOW_MS = 2 * 60 * 1000;
+export const ANTI_SNIPE_EXTENSION_MS = 2 * 60 * 1000;
+
 export const BID_ERRORS = {
   NOT_FOUND: 'That auction does not exist.',
   CLOSED: 'This auction has already ended.',
@@ -25,6 +33,7 @@ const AUCTION_DETAIL_SQL = `
          a.end_time       AS endTime,
          a.status         AS status,
          a.winner_id      AS winnerId,
+         w.first_name || ' ' || SUBSTR(w.last_name, 1, 1) || '.' AS winnerName,
          i.id             AS itemId,
          i.title          AS title,
          i.description    AS description,
@@ -34,8 +43,9 @@ const AUCTION_DETAIL_SQL = `
          u.first_name || ' ' || u.last_name AS sellerName,
          (SELECT COUNT(*) FROM bids b WHERE b.auction_id = a.id) AS bidCount
   FROM auctions a
-  JOIN items i ON i.id = a.item_id
-  JOIN users u ON u.id = i.seller_id
+  JOIN items i      ON i.id = a.item_id
+  JOIN users u      ON u.id = i.seller_id
+  LEFT JOIN users w ON w.id = a.winner_id
   WHERE a.id = ?
 `;
 
@@ -112,11 +122,20 @@ export function placeBid({ auctionId, bidderId, amount }) {
 
     db.prepare('INSERT INTO bids (auction_id, bidder_id, amount, created_at) VALUES (?, ?, ?, ?)')
       .run(auctionId, bidderId, amount, nowIso());
-    db.prepare('UPDATE auctions SET current_price = ? WHERE id = ?').run(amount, auctionId);
+
+    // Anti-sniping: a late bid moves the end time out, giving everyone else a
+    // fair chance to respond.
+    const now = Date.now();
+    const endsAt = new Date(auction.endTime).getTime();
+    const extended = endsAt - now <= ANTI_SNIPE_WINDOW_MS;
+    const newEndTime = extended ? new Date(now + ANTI_SNIPE_EXTENSION_MS).toISOString() : auction.endTime;
+
+    db.prepare('UPDATE auctions SET current_price = ?, end_time = ? WHERE id = ?')
+      .run(amount, newEndTime, auctionId);
 
     db.exec('COMMIT');
 
-    return { ok: true, auction: getAuctionById(auctionId) };
+    return { ok: true, auction: getAuctionById(auctionId), extended };
   } catch (err) {
     db.exec('ROLLBACK');
     throw err;

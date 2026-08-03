@@ -9,6 +9,7 @@ import {
   listItemsBySeller,
   listOpenAuctions,
 } from '../db/auctions.js';
+import { listWinsForBuyer } from '../db/transactions.js';
 
 export const dashboardRouter = express.Router();
 
@@ -17,14 +18,19 @@ const isOpen = (row) => row.status === 'open';
 function buildBuyerView(userId) {
   const myBids = listBidsByUser(userId);
   const openBids = myBids.filter(isOpen);
+  const wins = listWinsForBuyer(userId);
+  const unpaid = wins.filter((win) => win.paymentStatus !== 'paid');
 
   return {
     liveAuctions: listOpenAuctions(),
     myBids,
+    wins,
     stats: [
       { label: 'Active Bids', value: String(openBids.length) },
       { label: 'Currently Winning', value: String(openBids.filter((row) => row.isWinning).length) },
-      { label: 'Auctions Live', value: String(listOpenAuctions().length) },
+      unpaid.length > 0
+        ? { label: 'Payment Due', value: String(unpaid.length) }
+        : { label: 'Auctions Won', value: String(wins.length) },
     ],
   };
 }
