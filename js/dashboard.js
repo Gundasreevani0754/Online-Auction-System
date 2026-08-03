@@ -113,6 +113,13 @@
         var image = el('img', 'auction-img');
         image.src = auction.imageUrl;
         image.alt = auction.title;
+        // A dead or hotlink-blocked photo URL falls back to a placeholder
+        // rather than showing broken-image text.
+        image.addEventListener('error', function useFallback() {
+            if (image.src.indexOf('/images/placeholder.svg') === -1) {
+                image.src = '/images/placeholder.svg';
+            }
+        });
         image.loading = 'lazy';
         imageWrapper.appendChild(image);
 

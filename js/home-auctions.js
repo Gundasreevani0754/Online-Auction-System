@@ -73,14 +73,16 @@
         var image = el('img', 'auction-img');
         image.src = auction.imageUrl;
         image.alt = auction.title;
+        // A dead or hotlink-blocked photo URL falls back to a placeholder
+        // rather than showing broken-image text.
+        image.addEventListener('error', function useFallback() {
+            if (image.src.indexOf('/images/placeholder.svg') === -1) {
+                image.src = '/images/placeholder.svg';
+            }
+        });
         image.loading = 'lazy';
         imageWrapper.appendChild(image);
 
-        var watchlist = el('button', 'watchlist-btn');
-        watchlist.type = 'button';
-        watchlist.setAttribute('aria-label', 'Add to watchlist');
-        watchlist.appendChild(el('i', 'fa-regular fa-heart'));
-        imageWrapper.appendChild(watchlist);
 
         var timer = el('div', 'countdown-timer');
         timer.appendChild(el('i', 'fa-regular fa-clock'));
@@ -95,7 +97,7 @@
 
         var seller = el('div', 'seller-info');
         var avatar = el('img', 'seller-avatar');
-        avatar.src = 'https://i.pravatar.cc/100?img=' + auction.sellerId;
+        avatar.src = '/images/avatar.svg';
         avatar.alt = '';
         seller.appendChild(avatar);
         var sellerName = el('span', null, auction.sellerName + ' ');
@@ -143,8 +145,33 @@
                 return;
             }
 
+            // "/?category=Luxury Watches" from the footer links shows just
+            // that category, with a heading saying what is being filtered.
+            var wanted = new URLSearchParams(window.location.search).get('category');
+            var auctions = wanted
+                ? data.auctions.filter(function (a) { return a.category === wanted; })
+                : data.auctions;
+
+            var heading = document.querySelector('#collections .section-title');
+            if (wanted && heading) {
+                heading.textContent = '';
+                heading.appendChild(document.createTextNode(wanted + ' '));
+                var reset = el('a', 'text-gradient', '(show all)');
+                reset.href = '/#collections';
+                reset.style.fontSize = '1rem';
+                heading.appendChild(reset);
+            }
+
             grid.textContent = '';
-            data.auctions.forEach(function (auction, index) {
+
+            if (auctions.length === 0) {
+                var empty = el('div', 'glass-card', 'No live auctions in this category right now.');
+                empty.style.cssText = 'padding: 2rem; text-align: center; color: var(--text-muted); grid-column: 1 / -1;';
+                grid.appendChild(empty);
+                return;
+            }
+
+            auctions.forEach(function (auction, index) {
                 grid.appendChild(buildCard(auction, index));
             });
 

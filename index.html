@@ -24,9 +24,8 @@
                 BidderX
             </a>
             <div class="nav-links">
-                <a href="#" class="active">Home</a>
-                <a href="#">Collections</a>
-                <a href="#">How it Works</a>
+                <a href="/" class="active">Home</a>
+                <a href="#collections">Collections</a>
             </div>
             <div class="nav-actions">
                 <button class="btn btn-glass" onclick="document.body.classList.toggle('dark-mode')"><i class="fa-solid fa-moon"></i></button>
@@ -76,11 +75,11 @@
                 
                 <div class="hero-card glass-card">
                     <div class="auction-img-wrapper" style="height: 300px; margin-bottom: 1rem;">
-                        <img src="https://images.unsplash.com/photo-1542496658-e3267894cb97?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Rolex Watch" class="auction-img" style="border-radius: 12px;">
+                        <img src="/images/breitling-superocean.jpg" alt="Breitling Superocean Heritage Chronograph" class="auction-img" style="border-radius: 12px;">
                         <div class="live-badge"><div class="live-dot"></div> LIVE</div>
                         <div class="countdown-timer"><i class="fa-regular fa-clock"></i> 04:23:45</div>
                     </div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Rolex Submariner Date</h3>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Breitling Superocean Heritage</h3>
                     <div class="bid-info" style="border: none; padding: 0;">
                         <div class="current-bid">
                             <span class="bid-label">Current Highest Bid</span>
@@ -104,14 +103,14 @@
     </section>
 
     <!-- Trending Section -->
-    <section class="container" style="padding: 5rem 2rem;">
+    <section class="container" id="collections" style="padding: 5rem 2rem;">
         <h2 class="section-title">Trending <span class="text-gradient">Collections</span></h2>
         
         <div class="auctions-grid">
             <!-- Card 1 -->
             <div class="glass-card auction-card slide-up" style="animation-delay: 0.1s;">
                 <div class="auction-img-wrapper">
-                    <img src="https://images.unsplash.com/photo-1599643478514-4a4e0f1523bb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Diamond Ring" class="auction-img">
+                    <img src="/images/diamond-ring.jpg" alt="Diamond Ring" class="auction-img">
                     <button class="watchlist-btn"><i class="fa-regular fa-heart"></i></button>
                     <div class="countdown-timer"><i class="fa-regular fa-clock"></i> 02:15:30</div>
                 </div>
@@ -119,7 +118,7 @@
                     <div class="auction-category">Women's Jewelry</div>
                     <div class="auction-title">18K White Gold Diamond Ring (2ct)</div>
                     <div class="seller-info">
-                        <img src="https://i.pravatar.cc/100?img=1" alt="Seller" class="seller-avatar">
+                        <img src="/images/avatar.svg" alt="Seller" class="seller-avatar">
                         <span>TiffanyCo <i class="fa-solid fa-circle-check verified-icon"></i></span>
                     </div>
                     <div class="bid-info">
@@ -136,7 +135,7 @@
             <!-- Card 2 -->
             <div class="glass-card auction-card slide-up" style="animation-delay: 0.2s;">
                 <div class="auction-img-wrapper">
-                    <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Omega Watch" class="auction-img">
+                    <img src="/images/omega-speedmaster.jpg" alt="Omega Watch" class="auction-img">
                     <div class="live-badge"><div class="live-dot"></div> LIVE</div>
                     <button class="watchlist-btn"><i class="fa-regular fa-heart"></i></button>
                 </div>
@@ -144,7 +143,7 @@
                     <div class="auction-category">Luxury Watches</div>
                     <div class="auction-title">Omega Speedmaster Professional</div>
                     <div class="seller-info">
-                        <img src="https://i.pravatar.cc/100?img=2" alt="Seller" class="seller-avatar">
+                        <img src="/images/avatar.svg" alt="Seller" class="seller-avatar">
                         <span>LuxuryTime <i class="fa-solid fa-circle-check verified-icon"></i></span>
                     </div>
                     <div class="bid-info">
@@ -161,7 +160,7 @@
             <!-- Card 3 -->
             <div class="glass-card auction-card slide-up" style="animation-delay: 0.3s;">
                 <div class="auction-img-wrapper">
-                    <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Diamond Necklace" class="auction-img">
+                    <img src="/images/cartier-necklace.jpg" alt="Diamond Necklace" class="auction-img">
                     <button class="watchlist-btn"><i class="fa-regular fa-heart"></i></button>
                     <div class="countdown-timer"><i class="fa-regular fa-clock"></i> 1d 05:40:00</div>
                 </div>
@@ -169,7 +168,7 @@
                     <div class="auction-category">Women's Jewelry</div>
                     <div class="auction-title">Cartier Platinum Diamond Necklace</div>
                     <div class="seller-info">
-                        <img src="https://i.pravatar.cc/100?img=3" alt="Seller" class="seller-avatar">
+                        <img src="/images/avatar.svg" alt="Seller" class="seller-avatar">
                         <span>PremiumJewels <i class="fa-solid fa-circle-check verified-icon"></i></span>
                     </div>
                     <div class="bid-info">
@@ -190,7 +189,7 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <a href="#" class="logo" style="margin-bottom: 1rem;">
+                    <a href="/" class="logo" style="margin-bottom: 1rem;">
                         <div class="logo-icon"><i class="fa-solid fa-gem"></i></div>
                         BidderX
                     </a>
@@ -199,21 +198,22 @@
                 <div class="footer-col">
                     <h4>Marketplace</h4>
                     <div class="footer-links">
-                        <a href="#">Luxury Watches</a>
-                        <a href="#">Women's Jewelry</a>
-                        <a href="#">Diamonds</a>
+                        <a href="/?category=Luxury%20Watches">Luxury Watches</a>
+                        <a href="/?category=Women's%20Jewelry">Women's Jewelry</a>
+                        <a href="/?category=Diamonds">Diamonds</a>
                     </div>
                 </div>
                 <div class="footer-col">
-                    <h4>Resources</h4>
+                    <h4>Account</h4>
                     <div class="footer-links">
-                        <a href="#">Help Center</a>
-                        <a href="#">Authentication</a>
+                        <a href="/login">Log In</a>
+                        <a href="/register">Sign Up</a>
+                        <a href="/dashboard">Dashboard</a>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 BidderX. All rights reserved.</p>
+                <p>&copy; 2026 BidderX. All rights reserved.</p>
             </div>
         </div>
     </footer>

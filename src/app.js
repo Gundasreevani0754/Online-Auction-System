@@ -44,6 +44,8 @@ export function createApp() {
   // Stylesheets and browser scripts.
   app.use('/css', express.static(path.join(ROOT_DIR, 'css'), { maxAge: STATIC_MAX_AGE }));
   app.use('/js', express.static(path.join(ROOT_DIR, 'js'), { maxAge: STATIC_MAX_AGE }));
+  // Product photos are stored locally so the site works without internet.
+  app.use('/images', express.static(path.join(ROOT_DIR, 'images'), { maxAge: STATIC_MAX_AGE }));
 
   app.use(authRouter);
   app.use(dashboardRouter);
@@ -56,9 +58,9 @@ export function createApp() {
     handlers.push((req, res) => res.sendFile(filePath));
 
     app.get(route, ...handlers);
-    if (route !== '/') {
-      app.get(`/${file}`, ...handlers);
-    }
+
+    // "/" also answers on "/index.html" so the links written in the HTML work.
+    app.get(`/${file}`, ...handlers);
   }
 
   app.use((req, res) => {
